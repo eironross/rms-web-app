@@ -1,6 +1,8 @@
 import asyncio
 from collections import defaultdict
 
+## in memory
+
 class EventBus:
     subscribers = defaultdict(list) ## handle list if not available
     

@@ -38,7 +38,12 @@ Build a full‑stack web application to automate regulatory reporting for an Ene
 - PostgreSQL
 
 ## Architecture
-- insert drawio here
+
+### Front End 
+- insert flow here
+
+### API Architecture
+![image](./assets/api-architecture.png)
 
 ## Flow charts
 - insert flow chart
@@ -79,6 +84,7 @@ Build a full‑stack web application to automate regulatory reporting for an Ene
 | **Event Bus**            | Handles async event communication          |
 
 ## Inspiration
+![image](./assets/report-1.png)
 - This project was inspired by one of my old projects with the same name, but this time I’m taking it to the next level understanding how to build a system where machines communicate with each other to handle tasks.
 - The idea of automation started when I realized there are repetitive tasks that can be automated to save time and effort.
 - It all began with an Excel file, where I tried to automate our reporting since there were multiple reports to manage using VBA.
