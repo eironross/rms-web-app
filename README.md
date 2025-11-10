@@ -1,4 +1,10 @@
-# Report Management Service (RMS)
+# Report Management Service (RMS) - Backend Service
+<span><img src="https://img.shields.io/badge/In_development-brightgreen"></span>
+<span><img src="https://img.shields.io/badge/hibernating_half_half-orange"></span>
+<span><img src="https://img.shields.io/badge/python-yellow?logo=python"></span>
+<span><img src="https://img.shields.io/badge/fastapi-grey?logo=fastapi"></span>
+<span><img src="https://img.shields.io/badge/sqlalchemy-black?logo=sqlalchemy"></span>
+<span><img src="https://img.shields.io/badge/docker-blue?logo=docker"></span>
 <hr>
 
 ## Purpose
@@ -82,6 +88,9 @@ Build a full‑stack web application to automate regulatory reporting for an Ene
 | **Notification Service** | Sends alerts (email, message)              |
 | **Audit Service**        | Tracks all report and approval actions     |
 | **Event Bus**            | Handles async event communication          |
+
+## Changelogs
+- Please check the logs [here](./docs/logs.md)
 
 ## Inspiration
 ![image](./assets/report-1.png)

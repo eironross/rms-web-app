@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:14.19-trixie
+    container_name: app-postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+    volumes:
+    - db_data:/var/lib/postgresql/data
+    - ./init-db/create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
+
+  user_service:
+    build:
+      context: ./server/services/user_service
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_DRIVER: "postgresql+asyncpg"
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: user_service
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+
+volumes:
+  db_data:
