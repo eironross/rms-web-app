@@ -29,6 +29,9 @@ services:
       POSTGRES_HOST: db
       POSTGRES_PORT: 5432
       POSTGRES_DB: user_service
+    volumes:
+      - ./server/services/user_service:/app
+    command: uvicorn main:app --host 0.0.0.0 --reload
     depends_on:
       db:
         condition: service_healthy

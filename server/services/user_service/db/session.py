@@ -4,11 +4,9 @@ from sqlalchemy.ext.asyncio import (
         AsyncEngine, AsyncSession, create_async_engine, async_sessionmaker
 )
 from .config import create_url
+from contextlib import asynccontextmanager
 
 DATABASE_URI = create_url()
-
-
-print(DATABASE_URI)
 
 engine: AsyncEngine = create_async_engine(url=DATABASE_URI, echo=True)
 AsyncSessionLocal = async_sessionmaker(
@@ -17,19 +15,8 @@ AsyncSessionLocal = async_sessionmaker(
     class_=AsyncSession
 )
 
+@asynccontextmanager
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
   async with AsyncSessionLocal() as session:
-    try:
+        print(f"Inside the get_db: {session}")
         yield session
-    except SQLAlchemyError as exc:
-        await session.rollback()
-        raise exc
-
-
-async def get_session() -> AsyncSession:
-    session: Optional[AsyncSession] = None
-    async for session in get_db():
-        break
-    if session is None:
-        raise RuntimeError("No database session available!")
-    return session

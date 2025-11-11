@@ -1,25 +1,35 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
-
+from typing import Optional, List
+from datetime import datetime
 
 class User(BaseModel):
-    id: int
+    first_name: str
+    last_name: str
+    password: str
+    email: EmailStr
+    role: List[str]
+    
+    
+class UserOut(BaseModel):
     first_name: str
     last_name: str
     email: EmailStr
-    job_title: str
-    facility: Optional[str] = None
+    role: List[str]
     
-    
+class RoleReponse(BaseModel):
+    role: List[str]
+
+    model_config = {
+        'from_attributes': True
+    }
 
 class UserResponse(BaseModel):
-    id: int
-    first_name: str
-    last_name: str
-    email: EmailStr
-    job_title: str
-    facility: Optional[str] = None
-    
+    user: UserOut
+    message: str = "New user created"
+    status: str = "200"
+    database: str = "user_service"
+    return_in: datetime = datetime.now()
 
-    class Config:
-        orm_mode = True  # allows returning SQLAlchemy models directly
+    model_config = {
+        'from_attributes': True
+    }
