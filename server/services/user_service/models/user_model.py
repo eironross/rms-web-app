@@ -55,10 +55,11 @@ class UserModel(Base):
     
     roles: Mapped[list["UserRoleModel"]] = relationship(
         secondary="user_xref",
-        back_populates="users"
+        back_populates="users",
+        lazy="selectin"
     )
     
-    profile: Mapped["UserProfileModel"] = relationship(back_populates="user")
+    profile: Mapped["UserProfileModel"] = relationship(back_populates="user", lazy="selectin")
 
 class UserProfileModel(Base):
     __tablename__ = "user_profiles"
@@ -97,7 +98,7 @@ class UserProfileModel(Base):
         comment="Time the User was updated",
     )
     
-    user: Mapped["UserModel"] = relationship(back_populates="profile")
+    user: Mapped["UserModel"] = relationship(back_populates="profile", lazy="selectin")
     
 class UserJunctionModel(Base):
     __tablename__ = "user_xref"
@@ -155,5 +156,6 @@ class UserRoleModel(Base):
 
     users: Mapped[list["UserModel"]] = relationship(
         secondary="user_xref",
-        back_populates="roles"
+        back_populates="roles",
+        lazy="selectin"
     )

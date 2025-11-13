@@ -32,3 +32,17 @@ API
 - meaning ```python async with get_db() as db: ``` is implemented
     - try: craeeting the session the crud itself instead from the FastApi Depends 
 - greetlet spawn
+
+## 11/14/2025
+
+### user_service
+- added the update route and logic
+- updated the BaseModel, trying inheritance in the pydantics. Used UserBase for common detials
+
+### issue
+- n/a
+
+### resolves
+- fixed the async session on the db
+- resolved issue on the greenlet spawn using ***relationship(back_populates="profile", lazy="selectin")*** the lazy arg then selectin. not sure why the "joined" is causing an error. For used the "selectin"
+    

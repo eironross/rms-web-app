@@ -1,10 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends
-from schemas.user_schema import UserResponse, UserOut, User, RoleReponse
-from models.user_model import UserModel, UserRoleModel
+from schemas.user_schema import UserResponse, User, UserID
 from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from crud.user_crud import create_user
+from crud.user_crud import create_user, update_user
 from db.session import get_db, engine  
 from sqlalchemy import text, select
 
@@ -20,25 +19,30 @@ async def health():
         return {"status": "error", "database": "unreachable"}
 
 @routers.post("/create")
-async def create_users_route(payload: User):
-    async with get_db() as session:
-        new_users = await create_user(payload, session)
+async def create_users_route(payload: User, db: Annotated[AsyncSession, Depends(get_db)]):
+   
+    user = await create_user(payload, db)
 
-        if not new_users:
-            raise HTTPException(
-                status_code=400,
-                detail="Something went wrong. When creating the user."
-            )
+    if not user:
+        raise HTTPException(
+            status_code=400,
+            detail="Something went wrong. When creating the user."
+        )
     return UserResponse(
-        user=new_users
+        user=user
     )
-
-@routers.get("/test")
-async def get_roles_route():
-    async with get_db() as db:
-        print(f"In the route itself {db}")
-        result = (await db.execute(
-                select(UserRoleModel))
-            ).scalars().all()
-        roles = [r.role for r in result]
-    return RoleReponse(role=roles)
+    
+@routers.put("/update/{id}")
+async def update_users_route(id: int, payload: UserID, db: Annotated[AsyncSession, Depends(get_db)]):
+    
+    user = await update_user(id, payload, db)
+    
+    if not user:
+        raise HTTPException(
+            status_code=400,
+            detail="Something went wrong. When creating the user."
+        )
+    
+    return UserResponse(
+        user=user
+    )
