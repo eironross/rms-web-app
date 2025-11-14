@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 
 DATABASE_URI = create_url()
 
-engine: AsyncEngine = create_async_engine(url=DATABASE_URI, echo=True)
+engine: AsyncEngine = create_async_engine(url=DATABASE_URI, echo=False)
 AsyncSessionLocal = async_sessionmaker(
     bind=engine,
     expire_on_commit=False,

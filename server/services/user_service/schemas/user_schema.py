@@ -16,6 +16,8 @@ class UserOut(UserBase):
     email: EmailStr
     role: List[str]
     
+    class Config:
+        from_attributes = True
 
 class UserUpdate(BaseModel):
     first_name: Optional[str] = None
@@ -26,15 +28,19 @@ class UserUpdate(BaseModel):
     
 class UserID(BaseModel):
     id: int
-
+    
+class UserAll(BaseModel):
+    total_count: int
+    page: int
+    size: int
+    users: List[UserOut]
 
 class UserResponse(BaseModel):
-    user: Optional[Union[UserOut, UserID]] = None
+    user: Optional[Union[UserOut, UserID, UserAll]] = None
     message: str = "New user created"
     status: int = 200
     database: str = "user_service"
     return_in: datetime = datetime.now()
 
-    model_config = {
-        'from_attributes': True
-    }
+    class Config:
+        from_attributes = True

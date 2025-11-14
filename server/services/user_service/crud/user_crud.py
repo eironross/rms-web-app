@@ -1,11 +1,76 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, delete
-from models.user_model import UserModel, UserProfileModel, UserRoleModel
-from schemas.user_schema import User, UserOut, UserID, UserUpdate
-from auth.password import hash_password
+from sqlalchemy import select, func
+from sqlalchemy.orm import selectinload
 from fastapi import HTTPException
+from typing import List
+
+from models.user_model import UserModel, UserProfileModel, UserRoleModel
+from schemas.user_schema import User, UserOut, UserID, UserUpdate, UserAll
+from auth.password import hash_password
 ## http exception handler
 
+async def get_user(id: int, session: AsyncSession) -> UserOut:
+    async with session as db:
+        try:
+            result = (await db.execute(
+                select(UserModel).where(UserModel.id == id)
+            )).scalar_one_or_none()
+            
+            if result is None:
+                raise HTTPException(status_code=404, detail="User can't be found.")
+            
+            return UserOut(
+                id=result.id,
+                first_name=result.profile.first_name,
+                last_name=result.profile.last_name,
+                email=result.email,
+                role=[r.role for r in result.roles]
+            )
+            
+        except Exception as e: 
+            print(f"Error occured in {e}")
+            raise
+        
+async def get_all_users(session: AsyncSession, page: int = 1, size: int = 10)-> UserAll:
+    
+    async with session as db:
+        try:
+            offset = (page - 1) * size
+            total_count = (await db.execute(
+                select(func.count(UserModel.id))
+            )).scalar()
+            
+            result = (await db.execute(
+                select(UserModel)
+                .options(
+                    selectinload(UserModel.roles),
+                    selectinload(UserModel.profile)
+                )
+                .offset(offset).limit(size)
+            )).scalars().all()
+            print(result)
+            print(len(result))
+            
+            users = [UserOut.model_validate({
+                "id": u.id,
+                "first_name": u.profile.first_name,
+                "last_name": u.profile.last_name,
+                "email": u.email,
+                "role": [r.role for r in u.roles]
+            })
+                for u in result]
+            
+            print(users)
+            return UserAll(
+                total_count=total_count, 
+                page=page,
+                size=size,
+                users=users
+            )
+            
+        except Exception as e:
+            print(f"Error occured in {e}")
+            raise 
 
 async def create_user(payload: User, session: AsyncSession) -> UserOut:
     async with session as db:
@@ -49,7 +114,7 @@ async def update_user(id: int, payload: UserUpdate, session: AsyncSession) -> Us
             
             print(result)
             
-            if not result:
+            if result is None:
                 raise HTTPException(status_code=404, detail="User can't be found.")
             
 
@@ -81,7 +146,7 @@ async def update_user(id: int, payload: UserUpdate, session: AsyncSession) -> Us
             return UserOut(
                 first_name=result.profile.first_name if result.profile else None,
                 last_name=result.profile.last_name if result.profile else None,
-                email=result.email,
+                email=result.email if result.email else None,
                 role=[r.role for r in result.roles] if result.roles else None
             )
             

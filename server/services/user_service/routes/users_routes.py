@@ -1,9 +1,9 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Query
 from schemas.user_schema import UserResponse, User, UserUpdate, UserID
 from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from crud.user_crud import create_user, update_user, delete_user
+from crud.user_crud import create_user, update_user, delete_user, get_user, get_all_users
 from db.session import get_db, engine  
 from sqlalchemy import text, select
 
@@ -18,14 +18,42 @@ async def health():
     except Exception:
         return {"status": "error", "database": "unreachable"}
     
-@routers.get("/get_user/{id}")
-async def get_user(id: int, db: Annotated[AsyncSession, Depends(get_db)]):
-    pass
-
+@routers.get("/get-user/{id}")
+async def get_user_route(id: int, db: Annotated[AsyncSession, Depends(get_db)]):
+    
+    user = await get_user(id, db)
+    
+    if not user:
+        raise HTTPException(
+            status_code=400,
+            detail="Something went wrong. When retriving the user."
+        )
+        
+    return UserResponse(
+        user=user, 
+        message="Successfully retrieve the user",
+        status=200
+    )
 @routers.get("/get-all/")
-async def get_user(id: int, db: Annotated[AsyncSession, Depends(get_db)]):
+async def get_users_routes(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    page: int = Query(1, ge=1),  
+    size: int = Query(10, ge=1, le=100)
+):
     ## apply paginate
-    pass
+    user = await get_all_users(db, page, size)
+    
+    if not user:
+        raise HTTPException(
+            status_code=400,
+            detail="Something went wrong. When retriving the user."
+        )
+        
+    return UserResponse(
+        user=user, 
+        message="Successfully retrieve the user",
+        status=200
+    )
 
 @routers.post("/create")
 async def create_users_route(payload: User, db: Annotated[AsyncSession, Depends(get_db)]):

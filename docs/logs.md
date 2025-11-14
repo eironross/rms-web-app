@@ -9,7 +9,11 @@
     - added ```passive_deletes=True```
     - added ```cascade="all, delete-orphan"```
         - do not used the delete orphan in the xref scenario only use the passive_delete
-
+- added get_user or get_all users routes and logic
+    - used Query for Fastapi to paginate the query ```.../users/get-all?page=1&size=10```
+    - by default page is 1 then size = 10
+    - offset (page - 1) * size
+    
 ### issue
 - n/a
 
