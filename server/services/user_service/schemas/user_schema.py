@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional, List
+from typing import Optional, List, Union
 from datetime import datetime
 
 class UserBase(BaseModel):
@@ -12,21 +12,26 @@ class User(UserBase):
     role: List[str] = None
     
 class UserOut(UserBase):
+    id: Optional[int] = None
     email: EmailStr
     role: List[str]
     
 
-class UserID(BaseModel):
+class UserUpdate(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     email: Optional[EmailStr] = None
     password: Optional[str] = None
     role: Optional[List[str]] = None
+    
+class UserID(BaseModel):
+    id: int
+
 
 class UserResponse(BaseModel):
-    user: UserOut
+    user: Optional[Union[UserOut, UserID]] = None
     message: str = "New user created"
-    status: str = "200"
+    status: int = 200
     database: str = "user_service"
     return_in: datetime = datetime.now()
 

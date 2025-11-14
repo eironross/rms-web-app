@@ -56,16 +56,17 @@ class UserModel(Base):
     roles: Mapped[list["UserRoleModel"]] = relationship(
         secondary="user_xref",
         back_populates="users",
-        lazy="selectin"
+        lazy="selectin",
+        passive_deletes=True
     )
     
-    profile: Mapped["UserProfileModel"] = relationship(back_populates="user", lazy="selectin")
+    profile: Mapped["UserProfileModel"] = relationship(back_populates="user", lazy="selectin", passive_deletes=True, cascade="all, delete-orphan")
 
 class UserProfileModel(Base):
     __tablename__ = "user_profiles"
     
     id: Mapped[int] = mapped_column(
-        ForeignKey("users.id"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         primary_key=True,
         nullable=False
     )
@@ -98,17 +99,17 @@ class UserProfileModel(Base):
         comment="Time the User was updated",
     )
     
-    user: Mapped["UserModel"] = relationship(back_populates="profile", lazy="selectin")
+    user: Mapped["UserModel"] = relationship(back_populates="profile", lazy="selectin", passive_deletes=True)
     
 class UserJunctionModel(Base):
     __tablename__ = "user_xref"
     
     user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         primary_key=True
     )
     role_id: Mapped[int] = mapped_column(
-        ForeignKey("user_roles.id"),
+        ForeignKey("user_roles.id", ondelete="CASCADE"),
          primary_key=True
     )
     
@@ -157,5 +158,6 @@ class UserRoleModel(Base):
     users: Mapped[list["UserModel"]] = relationship(
         secondary="user_xref",
         back_populates="roles",
-        lazy="selectin"
+        lazy="selectin", 
+        passive_deletes=True
     )

@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete
 from models.user_model import UserModel, UserProfileModel, UserRoleModel
-from schemas.user_schema import User, UserOut, UserID
+from schemas.user_schema import User, UserOut, UserID, UserUpdate
 from auth.password import hash_password
 from fastapi import HTTPException
 ## http exception handler
@@ -39,7 +39,7 @@ async def create_user(payload: User, session: AsyncSession) -> UserOut:
             print(f"Error occured in {e}")
             raise
 
-async def update_user(id: int, payload: UserID, session: AsyncSession) -> UserOut:
+async def update_user(id: int, payload: UserUpdate, session: AsyncSession) -> UserOut:
     async with session as db:
         try:
             
@@ -85,6 +85,28 @@ async def update_user(id: int, payload: UserID, session: AsyncSession) -> UserOu
                 role=[r.role for r in result.roles] if result.roles else None
             )
             
+        except Exception as e:
+            print(f"Error occured in {e}")
+            raise
+        
+
+async def delete_user(id: UserID, session: AsyncSession) -> UserID:
+    async with session as db:
+        try:
+            result = (await db.execute(
+                select(UserModel).where(UserModel.id == id)
+            )).scalar_one_or_none()
+            
+            print(f"Return the user to {result}")
+            
+            if result is None:
+                raise HTTPException(status_code=404, detail="User can't be found.")
+            
+            await db.delete(result)
+            await db.commit()
+            
+            return result
+         
         except Exception as e:
             print(f"Error occured in {e}")
             raise
