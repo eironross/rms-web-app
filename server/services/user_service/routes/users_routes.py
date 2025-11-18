@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, status
 from schemas.user_schema import UserResponse, User, UserUpdate, UserID
 from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,7 +9,9 @@ from sqlalchemy import text, select
 
 routers = APIRouter(prefix="/users") 
 
-@routers.get("/health")
+db_dependency = Annotated[AsyncSession, Depends(get_db)]
+
+@routers.get("/health", status_code=status.HTTP_200_OK)
 async def health():
     try:
         async with engine.begin() as conn:
@@ -18,8 +20,8 @@ async def health():
     except Exception:
         return {"status": "error", "database": "unreachable"}
     
-@routers.get("/get-user/{id}")
-async def get_user_route(id: int, db: Annotated[AsyncSession, Depends(get_db)]):
+@routers.get("/get-user/{id}", status_code=status.HTTP_200_OK)
+async def get_user_route(id: int, db: db_dependency):
     
     user = await get_user(id, db)
     
@@ -34,9 +36,9 @@ async def get_user_route(id: int, db: Annotated[AsyncSession, Depends(get_db)]):
         message="Successfully retrieve the user",
         status=200
     )
-@routers.get("/get-all/")
+@routers.get("/get-all/", status_code=status.HTTP_200_OK)
 async def get_users_routes(
-    db: Annotated[AsyncSession, Depends(get_db)],
+    db: db_dependency,
     page: int = Query(1, ge=1),  
     size: int = Query(10, ge=1, le=100)
 ):
@@ -55,8 +57,8 @@ async def get_users_routes(
         status=200
     )
 
-@routers.post("/create")
-async def create_users_route(payload: User, db: Annotated[AsyncSession, Depends(get_db)]):
+@routers.post("/create", status_code=status.HTTP_201_CREATED)
+async def create_users_route(payload: User, db: db_dependency):
    
     user = await create_user(payload, db)
 
@@ -71,14 +73,14 @@ async def create_users_route(payload: User, db: Annotated[AsyncSession, Depends(
         status=201
     )
     
-@routers.put("/update/{id}")
-async def update_users_route(id: int, payload: UserUpdate, db: Annotated[AsyncSession, Depends(get_db)]):
+@routers.put("/update/{id}", status_code=status.HTTP_201_CREATED)
+async def update_users_route(id: int, payload: UserUpdate, db: db_dependency):
     
     user = await update_user(id, payload, db)
     
     if not user:
         raise HTTPException(
-            status_code=400,
+            status_code=200,
             detail="Something went wrong. When updating the user."
         )
     
@@ -89,8 +91,8 @@ async def update_users_route(id: int, payload: UserUpdate, db: Annotated[AsyncSe
         
     )
 
-@routers.delete("/delete/{id}")
-async def delete_users_route(id: int, db: Annotated[AsyncSession, Depends(get_db)]):
+@routers.delete("/delete/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_users_route(id: int, db: db_dependency):
 
     user = await delete_user(id, db)
     

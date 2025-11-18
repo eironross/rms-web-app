@@ -23,4 +23,3 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
         yield session
       except Exception as e:
         print(f"Error occured: {e}" )
-     

@@ -9,6 +9,16 @@
 - revise creation of db, instead of creating multiple db, just create multiple schemas.
 - compose revised
 
+### auth_services
+- first init
+- created routes, operations for auth
+
+### resolves
+- n/a
+
+### issues
+- to services to communicate with each other, auth_service and user_service container to container
+
 ## 11/15/2025
 
 ### user_service

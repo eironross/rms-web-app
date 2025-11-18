@@ -38,6 +38,28 @@ services:
     ports:
       - "8000:8000"
 
+  auth_service:
+    build:
+      context: ./server/services/auth_service
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_DRIVER: "postgresql+asyncpg"
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: rms_db
+      SECRET_KEY: "d50ba4dd3fe42e17e9faa9ec29f89708"
+      ALGORITHM: "HS256"
+      ACCESS_TOKEN_EXPIRE_MINUTES: 120
+    volumes:
+      - ./server/services/auth_service:/app
+    command: uvicorn main:app --host 0.0.0.0 --reload
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8001:8000"
 
 volumes:
   db_data:

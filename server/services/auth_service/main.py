@@ -1,22 +1,11 @@
 from fastapi import FastAPI, status
 from sqlalchemy import text
-from contextlib import asynccontextmanager
 
 ## Common Imports
-from core.db.db_init import create_db_and_tables
 from core.db.session import engine
 from routes import __routers__
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    try:
-        await create_db_and_tables()
-    except Exception as e:
-        print("Lifespan startup failed:", e)
-        raise
-    yield
-    
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 
 for route in __routers__:
     app.include_router(route)
@@ -24,7 +13,7 @@ for route in __routers__:
 @app.get("/", status_code=status.HTTP_200_OK)
 async def root():
     return {
-        "message": "Welcome to my User Services",
+        "message": "Welcome to my Auth Services",
         "status": "ok"
     }
     
