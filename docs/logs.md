@@ -1,5 +1,14 @@
 # Changes on the Services
 
+## 11/18/2025
+
+### user_service
+- restructure folders and imports
+- rename folder from ```common``` to ```core```
+- added ```init.sh``` to initialize db
+- revise creation of db, instead of creating multiple db, just create multiple schemas.
+- compose revised
+
 ## 11/15/2025
 
 ### user_service

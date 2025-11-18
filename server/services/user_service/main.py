@@ -1,16 +1,16 @@
 from fastapi import FastAPI
-from db.db_init import create_db_and_tables, create_dim_tables
-from db.session import engine
 from sqlalchemy import text
 from contextlib import asynccontextmanager
+
+## Common Imports
+from core.db.db_init import create_db_and_tables
+from core.db.session import engine
 from routes import __routers__
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
         await create_db_and_tables()
-        
-        await create_dim_tables()
     except Exception as e:
         print("Lifespan startup failed:", e)
         raise

@@ -1,13 +1,17 @@
+## Dependnecies
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
 from fastapi import HTTPException
 from typing import List
 
+## Service Import
 from models.user_model import UserModel, UserProfileModel, UserRoleModel
 from schemas.user_schema import User, UserOut, UserID, UserUpdate, UserAll
-from auth.password import hash_password
-## http exception handler
+
+## Common
+from core.auth.password import hash_password
+
 
 async def get_user(id: int, session: AsyncSession) -> UserOut:
     async with session as db:

@@ -16,7 +16,7 @@ services:
       - "5432:5432"
     volumes:
     - db_data:/var/lib/postgresql/data
-    - ./init-db/create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
+    - ./init-db/init.sh:/docker-entrypoint-initdb.d/init.sh
 
   user_service:
     build:
@@ -28,7 +28,7 @@ services:
       POSTGRES_PASSWORD: admin
       POSTGRES_HOST: db
       POSTGRES_PORT: 5432
-      POSTGRES_DB: user_service
+      POSTGRES_DB: rms_db
     volumes:
       - ./server/services/user_service:/app
     command: uvicorn main:app --host 0.0.0.0 --reload

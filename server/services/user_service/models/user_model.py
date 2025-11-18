@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from db.base_class import Base
+from core.db.base_class import Base
 
 from sqlalchemy import ForeignKey, text
 from sqlalchemy.dialects.postgresql import INTEGER, TIMESTAMP, VARCHAR, BOOLEAN
@@ -66,7 +66,7 @@ class UserProfileModel(Base):
     __tablename__ = "user_profiles"
     
     id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"),
+        ForeignKey("user_service.users.id", ondelete="CASCADE"),
         primary_key=True,
         nullable=False
     )
@@ -105,15 +105,13 @@ class UserJunctionModel(Base):
     __tablename__ = "user_xref"
     
     user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"),
+        ForeignKey("user_service.users.id", ondelete="CASCADE"),
         primary_key=True
     )
     role_id: Mapped[int] = mapped_column(
-        ForeignKey("user_roles.id", ondelete="CASCADE"),
+        ForeignKey("user_service.user_roles.id", ondelete="CASCADE"),
          primary_key=True
     )
-    
-
     
 class UserRoleModel(Base):
     """user_role model table expected roles in first run will be:
@@ -132,7 +130,7 @@ class UserRoleModel(Base):
     )
     
     role: Mapped[str] = mapped_column(
-        VARCHAR(20),
+        VARCHAR(100),
         nullable=False,
         comment="Role of the user, admin, regulatory, user"
     )

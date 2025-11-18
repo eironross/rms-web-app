@@ -4,7 +4,7 @@ from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from crud.user_crud import create_user, update_user, delete_user, get_user, get_all_users
-from db.session import get_db, engine  
+from core.db.session import get_db, engine
 from sqlalchemy import text, select
 
 routers = APIRouter(prefix="/users") 
