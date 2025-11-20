@@ -6,4 +6,5 @@ pydantic
 asyncpg
 passlib[bcrypt,argon2]
 email-validator
-python-jose[crytography]
+pyjwt
+python-multipart

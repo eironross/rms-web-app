@@ -1,5 +1,26 @@
 # Changes on the Services
 
+## 11/20/2025
+
+### user_service
+- test the protected routes using auth_service to validate tokens in ```/health``` and ```/get-all/```
+- added a connection to the auth_service to send request using httpx, note that the url in the containers will be like auth_service:8000/auth/users/me.
+- for development purpose the auth will be just simple auth using jwt for now
+
+### auth_services
+- added the ```get_current_user``` this will validate the tokens received from the authorization
+- added a test route ```/users/me```
+
+### resolves
+- uses the httpx to make the containers communicate to each other
+- use pyjwt to generate the tokens, since jose is abandoned?
+
+### issues
+- n/a
+
+### lookahead
+- add protected routes for the user_services, then continue to report_services
+
 ## 11/18/2025
 
 ### user_service
