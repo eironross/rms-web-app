@@ -9,8 +9,6 @@ from typing import List
 from models.user_model import UserModel, UserProfileModel, UserRoleModel
 from schemas.user_schema import User, UserOut, UserID, UserUpdate, UserAll
 
-## Common
-from core.auth.password import hash_password
 
 
 async def get_user(id: int, session: AsyncSession) -> UserOut:
@@ -75,38 +73,6 @@ async def get_all_users(session: AsyncSession, page: int = 1, size: int = 10)-> 
         except Exception as e:
             print(f"Error occured in {e}")
             raise 
-
-async def create_user(payload: User, session: AsyncSession) -> UserOut:
-    async with session as db:
-        try: 
-            ## fetch data from the roles table
-            result = (await db.execute(
-                select(UserRoleModel).where(UserRoleModel.role.in_(payload.role))
-            )).scalars().all()
-            
-            new_user = UserModel(
-                hashed_password=hash_password(payload.password),
-                email=payload.email, 
-                profile=UserProfileModel(
-                    first_name=payload.first_name,
-                    last_name=payload.last_name
-                ),
-                roles=result
-            )
-            
-            db.add(new_user) 
-            await db.commit()
-            await db.refresh(new_user)
-            
-            return UserOut(
-                first_name=new_user.profile.first_name,
-                last_name=new_user.profile.last_name,
-                email=new_user.email,
-                role=[r.role for r in new_user.roles]
-            )
-        except Exception as e: 
-            print(f"Error occured in {e}")
-            raise
 
 async def update_user(id: int, payload: UserUpdate, session: AsyncSession) -> UserOut:
     async with session as db:

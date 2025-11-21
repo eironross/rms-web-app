@@ -1,5 +1,25 @@
 # Changes on the Services
 
+## 11/21/2025
+
+### user_service, auth_service
+- removed the ```/create_user``` route from the endpoint. added it to the ```auth_services``` as ```/register``` auth will handle the creation of the users
+
+### gateway
+- added a dynamic route endpoint to accept any method request then forward to appropriate services 
+
+### resolves
+- string manipulation on the forward urls
+
+### issues
+- n/a
+
+### lookahead
+- build a proper JSON structure for responses
+- authentication on the gateway before having access on the services
+- add protected routes services, then continue to report_services, crud of the reports
+
+
 ## 11/20/2025
 
 ### user_service

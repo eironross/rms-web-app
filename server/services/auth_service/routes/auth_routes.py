@@ -4,13 +4,23 @@ from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
 import jwt
 from jwt.exceptions import InvalidTokenError
+from datetime import timedelta
 
-from schemas.auth_schema import UserLoggedIn, Token, TokenData, UserResponse, UserOut
+from schemas.auth_schema import (
+    UserLoggedIn, 
+    Token, 
+    TokenData, 
+    UserResponse, 
+    UserOut, 
+    User)
 from core.auth.password import AuthService
 from core.db.session import get_db, engine
 from sqlalchemy import text
-from crud.auth_crud import authenticate_users, get_user
-from datetime import timedelta
+from crud.auth_crud import (
+    authenticate_users, 
+    get_user, 
+    create_user
+    )
 from core.auth.password import ACCESS_TOKEN_EXPIRE_MINUTES
 
 routers = APIRouter(prefix="/auth") 
@@ -18,7 +28,7 @@ routers = APIRouter(prefix="/auth")
 auth = AuthService()
 
 db_dependency = Annotated[AsyncSession, Depends(get_db)]
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 async def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)],
@@ -52,7 +62,7 @@ async def health():
     except Exception:
         return {"status": "error", "database": "unreachable"}
     
-@routers.post("/token")
+@routers.post("/login")
 async def login_for_access_tokens(
     payload: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: db_dependency
@@ -92,4 +102,20 @@ async def read_users_me(
             email=current_user.email
         ),
         message="Hello World from the another world!"
+    )
+    
+@routers.post("/register", status_code=status.HTTP_201_CREATED)
+async def create_users_route(payload: User, db: db_dependency):
+   
+    user = await create_user(payload, db)
+
+    if not user:
+        raise HTTPException(
+            status_code=400,
+            detail="Something went wrong. When creating the user."
+        )
+    return UserResponse(
+        user=user, 
+        message="Successfully created new user",
+        status=201
     )

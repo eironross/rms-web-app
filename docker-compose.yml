@@ -18,6 +18,24 @@ services:
     - db_data:/var/lib/postgresql/data
     - ./init-db/init.sh:/docker-entrypoint-initdb.d/init.sh
 
+  api_gateway:
+    build:
+      context: ./server/gateway
+      dockerfile: Dockerfile
+    # In real development, dont expose the services routes in the project. Find the best practice handle the routes
+    # this is only for development and learning purposes for ease of access on the url using docker environments  
+    environment:
+      USER_SERVICE_URL: "http://user_service:8000"
+      AUTH_SERVICE_URL: "http://auth_service:8000"
+    volumes:
+      - ./server/gateway:/app
+    command: uvicorn main:app --host 0.0.0.0 --reload
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "1234:8000"
+
   user_service:
     build:
       context: ./server/services/user_service
