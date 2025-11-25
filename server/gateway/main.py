@@ -1,26 +1,38 @@
-from fastapi import FastAPI, HTTPException, status, Depends, Request
+from fastapi import FastAPI, HTTPException, status, Depends, Request, Cookie
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from typing import Annotated
 from starlette.responses import Response
 import httpx
 import os
 
-app = FastAPI()
 
 SERVICE_DISCOVERY = {
     "auth_service": os.environ.get("AUTH_SERVICE_URL"),
     "user_service": os.environ.get("USER_SERVICE_URL")   
 }
 
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+       i for i in SERVICE_DISCOVERY.values()
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/")
 async def root():
     return {
         "message": "Welcome to the API gateway for the Reporting Services"
         }
-
-@app.api_route("/{full_path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
-async def dynamic_routing(full_path: str, request: Request):
     
+@app.api_route("/{full_path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
+async def dynamic_routing(full_path: str, request: Request, access_token: str = Cookie(None)):
+    """ Dynamic Route to access any method then forward the request to appropriate services"""
     ## String Manipulate to create a target service url for the client
     target_service_url = None
     stripped_path = None

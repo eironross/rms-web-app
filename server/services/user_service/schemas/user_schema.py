@@ -41,6 +41,13 @@ class UserResponse(BaseModel):
     status: int = 200
     database: str = "user_service"
     return_in: datetime = datetime.now()
+    success: bool = True
 
     class Config:
         from_attributes = True
+        
+class HomeResponse(BaseModel):
+    message: str
+    status: str = "ok"
+    service: str = "user_services"
+    database: str = "rms_db"

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, Query, status, Request
-from schemas.user_schema import UserResponse, User, UserUpdate, UserID
+from schemas.user_schema import UserResponse, User, UserUpdate, UserID, HomeResponse
 from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,23 +11,62 @@ import httpx
 routers = APIRouter(prefix="/users") 
 
 AUTH_SERVICE_VALIDATE_URL = "http://auth_service:8000/auth/users/me"
-TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlaXJvbi5mbG9yZXNAZm9udGFpbmUuY29tIiwiZXhwIjoxNzYzNjQxNjI0fQ.R0JSS3EME9ibl4er-wCxY3ZHDJ_hbivjxKr8ywFjQbU"
-
 
 db_dependency = Annotated[AsyncSession, Depends(get_db)]
 
-@routers.get("/health", status_code=status.HTTP_200_OK)
+async def get_current_user_from_auth_service(request: Request):
+    """
+    Call the Auth Service to validate the user via token.
+    The token can come from Authorization header or HttpOnly cookie.
+    """
+    
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    
+    access_token = request.cookies.get("access_token")
+    
+    if access_token is None:
+        raise credentials_exception
+    print(request.cookies)
+    
+    headers = {"Authorization": f"{access_token}"}
+    print(headers)
+
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(AUTH_SERVICE_VALIDATE_URL, headers=headers)
+        except httpx.RequestError:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Cannot reach Auth Service"
+            )
+
+    if response.status_code != 202:
+        raise credentials_exception
+
+    return response.status_code  # This is the user data
+
+@routers.get("/health", tags=["health"], status_code=status.HTTP_200_OK)
 async def health():
+    """ Determine if the route up and running"""
     try:    
         async with engine.begin() as conn:
             await conn.execute(text("SELECT 1"))
-        return {"status": "ok", "database": "connected", "api": "user  route"}
+        return HomeResponse(
+        message="Welcome to my User Services, home route /auth/health",
+        )
     except Exception:
-        return {"status": "error", "database": "user_service"}
+        return HomeResponse(
+            message="Error occured in the system",
+            status="error"
+        )
     
 @routers.get("/get-user/{id}", status_code=status.HTTP_200_OK)
-async def get_user_route(id: int, db: db_dependency):
-    
+async def get_user_route(id: int, db: db_dependency, auth: Annotated[int, Depends(get_current_user_from_auth_service)]):
+    """Get a one user from the user db"""
     user = await get_user(id, db)
     
     if not user:
@@ -44,9 +83,11 @@ async def get_user_route(id: int, db: db_dependency):
 @routers.get("/get-all/", status_code=status.HTTP_200_OK)
 async def get_users_routes(
     db: db_dependency,
+    auth: Annotated[int, Depends(get_current_user_from_auth_service)],
     page: int = Query(1, ge=1),  
     size: int = Query(10, ge=1, le=100)
 ):
+    """Get a all users from the user db while also paginating the users based of the request"""
     ## apply paginate
     user = await get_all_users(db, page, size)
     
@@ -63,7 +104,14 @@ async def get_users_routes(
     )
     
 @routers.put("/update/{id}", status_code=status.HTTP_200_OK)
-async def update_users_route(id: int, payload: UserUpdate, db: db_dependency):
+async def update_users_route(id: int, payload: UserUpdate, db: db_dependency, auth: Annotated[int, Depends(get_current_user_from_auth_service)]):
+    """Updates the user information in the db"""
+    
+    if auth != 202:
+        raise HTTPException(
+            status_code=200,
+            detail="Something went wrong, its you not me.... :("
+        )
     
     user = await update_user(id, payload, db)
     
@@ -81,8 +129,8 @@ async def update_users_route(id: int, payload: UserUpdate, db: db_dependency):
     )
 
 @routers.delete("/delete/{id}", status_code=status.HTTP_200_OK)
-async def delete_users_route(id: int, db: db_dependency):
-
+async def delete_users_route(id: int, db: db_dependency, auth: Annotated[int, Depends(get_current_user_from_auth_service)]):
+    """ Deletes one user from the user db"""
     user = await delete_user(id, db)
     
     print(f"Deleted user {user}")

@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from core.db.db_init import create_db_and_tables
 from core.db.session import engine
 from routes import __routers__
+from schemas.user_schema import HomeResponse
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -21,18 +22,22 @@ app = FastAPI(lifespan=lifespan)
 for route in __routers__:
     app.include_router(route)
 
-@app.get("/", status_code=status.HTTP_200_OK)
+@app.get("/", status_code=status.HTTP_200_OK, response_model=HomeResponse)
 async def root():
-    return {
-        "message": "Welcome to my User Services",
-        "status": "ok"
-    }
+    return HomeResponse(
+        message="Welcome to my Auth Services",
+        )
     
-@app.get("/health", tags=["health"], status_code=status.HTTP_200_OK)
+@app.get("/health", tags=["health"], status_code=status.HTTP_200_OK, response_model=HomeResponse)
 async def health():
     try:
         async with engine.begin() as conn:
             await conn.execute(text("SELECT 1"))
-        return {"status": "ok", "database": "connected"}
+        return HomeResponse(
+        message="Welcome to my Auth Services",
+        )
     except Exception:
-        return {"status": "error", "database": "unreachable"}
+        return HomeResponse(
+            message="Error occured in the system",
+            status="error"
+        )

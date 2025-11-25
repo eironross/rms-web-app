@@ -1,5 +1,22 @@
 # Changes on the Services
 
+## 11/25/2025
+
+### auth_service
+- added to verify token thru cookies or bearer headers
+
+### user_service
+- added dependency to verify tokens from the cookie
+
+### resolves
+- n/a
+
+### issues
+- observe how can you just the gateways to verify tokens and auth
+
+### lookahead
+- test the routes then proceed in integrating the message brokers
+
 ## 11/21/2025
 
 ### user_service, auth_service
