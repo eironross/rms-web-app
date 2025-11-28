@@ -3,12 +3,10 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
         AsyncEngine, AsyncSession, create_async_engine, async_sessionmaker
 )
-from .config import create_url
 from contextlib import asynccontextmanager
+from core.config import settings
 
-DATABASE_URI = create_url()
-
-engine: AsyncEngine = create_async_engine(url=DATABASE_URI, echo=True)
+engine: AsyncEngine = create_async_engine(url=settings.DATABASE_URL, echo=True)
 AsyncSessionLocal = async_sessionmaker(
     bind=engine,
     expire_on_commit=False,

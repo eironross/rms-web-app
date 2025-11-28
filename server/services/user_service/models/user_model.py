@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from core.db.base_class import Base
+from db.base_class import Base
 
 from sqlalchemy import ForeignKey, text
 from sqlalchemy.dialects.postgresql import INTEGER, TIMESTAMP, VARCHAR, BOOLEAN

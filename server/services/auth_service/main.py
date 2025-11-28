@@ -3,13 +3,17 @@ from sqlalchemy import text
 from schemas.auth_schema import HomeResponse
 
 ## Common Imports
-from core.db.session import engine
+from db.session import engine
 from routes import __routers__
+from core.config import settings
 
-app = FastAPI()
+app = FastAPI(
+    title=settings.APP_NAME,
+    version=settings.APP_VERSION
+)
 
 for route in __routers__:
-    app.include_router(route)
+    app.include_router(route, prefix="/api/v1")
 
 @app.get("/", status_code=status.HTTP_200_OK, response_model=HomeResponse)
 async def root():

@@ -36,7 +36,7 @@ class UserAll(BaseModel):
     users: List[UserOut]
 
 class UserResponse(BaseModel):
-    user: Optional[Union[UserOut, UserID, UserAll]] = None
+    data: Optional[Union[UserOut, UserID, UserAll]] = None
     message: str = "New user created"
     status: int = 200
     database: str = "user_service"

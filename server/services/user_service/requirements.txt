@@ -7,3 +7,4 @@ asyncpg
 passlib[bcrypt,argon2]
 email-validator
 httpx
+pydantic_settings

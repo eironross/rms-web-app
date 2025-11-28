@@ -31,7 +31,7 @@ class TokenData(BaseModel):
     email: EmailStr | None = None    
 
 class UserResponse(BaseModel):
-    user: Union[TokenData, UserOut]
+    data: Union[TokenData, UserOut]
     tokens: Optional[Token] = None
     message: str = "New user created"
     status: int = 200

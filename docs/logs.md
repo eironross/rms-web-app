@@ -1,5 +1,22 @@
 # Changes on the Services
 
+## 11/28/2025
+- code freeze see you next year!
+
+### auth_service, user_service
+- added a logging module, non-persistent
+- added ```/api/v1``` to the routes
+- added a setting module, to clean up the scattered settings data in the files
+
+### resolves
+- n/a
+
+### issue
+- n/a
+
+### lookahead
+- test the routes then proceed in integrating the message brokers
+
 ## 11/25/2025
 
 ### auth_service

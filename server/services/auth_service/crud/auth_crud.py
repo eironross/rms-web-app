@@ -10,7 +10,7 @@ from models.auth_model import UserModel, UserRoleModel, UserProfileModel
 from schemas.auth_schema import UserOut, User
 
 ## Common
-from core.auth.password import AuthService
+from core.password import AuthService
 
 auth = AuthService()
 
@@ -57,6 +57,7 @@ async def authenticate_users(
                 return False
             
             return UserOut(
+                id=result.id,
                 first_name=result.profile.first_name,
                 last_name=result.profile.last_name,
                 email=result.email,
@@ -75,7 +76,7 @@ async def create_user(payload: User, session: AsyncSession) -> UserOut:
             user = (await db.execute(
                 select(UserModel).where(UserModel.email == payload.email)
             )).scalar_one_or_none()
-            
+            print(user)
             if user:
                 raise HTTPException(
                     status_code=400,

@@ -3,24 +3,25 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
         AsyncEngine, AsyncSession, create_async_engine, async_sessionmaker
 )
-from .config import create_url
+from core.config import settings
 from contextlib import asynccontextmanager
+from core.logger import get_logger
 
-DATABASE_URI = create_url()
-
-engine: AsyncEngine = create_async_engine(url=DATABASE_URI, echo=True)
+engine: AsyncEngine = create_async_engine(url=settings.DATABASE_URL, echo=False)
 AsyncSessionLocal = async_sessionmaker(
     bind=engine,
     expire_on_commit=False,
     class_=AsyncSession
 )
 
+logger = get_logger(__name__)
+
 @asynccontextmanager
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
       session = AsyncSessionLocal()
       try:
-        print(f"Inside the get_db: {session}")
+        logger.info(f"Inside the get_db: {session}")
         yield session
       except Exception as e:
-        print(f"Error occured: {e}" )
+         logger.error(f"Error occured: {e}" )
      

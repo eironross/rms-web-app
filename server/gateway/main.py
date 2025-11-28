@@ -1,11 +1,8 @@
 from fastapi import FastAPI, HTTPException, status, Depends, Request, Cookie
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from typing import Annotated
 from starlette.responses import Response
 import httpx
 import os
-
 
 SERVICE_DISCOVERY = {
     "auth_service": os.environ.get("AUTH_SERVICE_URL"),
@@ -60,11 +57,13 @@ async def dynamic_routing(full_path: str, request: Request, access_token: str = 
                 timeout=10.0
             )
             
-            return Response(
+            response = Response(
                 content=backend_response.content,
                 status_code=backend_response.status_code,
                 headers=dict(backend_response.headers)
             )
+            
+            return response
            
     except httpx.HTTPStatusError:
         raise HTTPException(

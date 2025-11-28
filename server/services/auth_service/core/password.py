@@ -3,10 +3,9 @@ import jwt
 from datetime import datetime, timedelta, timezone
 import os
 from models.auth_model import UserModel
+from core.config import get_setting
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
-ALGORITHM = os.environ.get("ALGORITHM")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES"))
+settings = get_setting()
 
 class AuthService():
     def __init__(self):
@@ -25,9 +24,9 @@ class AuthService():
         else:
             expire = datetime.now(timezone.utc) + timedelta(minutes=365)
         to_encode.update({"exp": expire})
-        encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+        encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
         return encoded_jwt
 
     async def decode_access_token(self, token: str) -> dict:
-            return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            return jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
     

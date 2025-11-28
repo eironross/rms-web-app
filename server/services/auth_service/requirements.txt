@@ -8,3 +8,4 @@ passlib[bcrypt,argon2]
 email-validator
 pyjwt
 python-multipart
+pydantic_settings
