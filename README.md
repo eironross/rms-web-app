@@ -23,11 +23,9 @@ Build a full‑stack web application to automate regulatory reporting for an Ene
 
 ## Audience
 
-- Energy Traders (primary users) — create and submit reports
-- Compliance Officers / Managers — review and approve reports
-- Regulatory Agencies (Company, ERC, DOE) — receive reports (external recipients)
-- Administrators — user and system management
-- DevOps / Engineers — deploy and maintain the system
+- Energy Traders (primary users): create and submit reports
+- Compliance Officers / Managers: review and approve reports
+- Regulatory Agencies (Company, ERC, DOE): receive reports (external recipients)
 
 ## Goals
 

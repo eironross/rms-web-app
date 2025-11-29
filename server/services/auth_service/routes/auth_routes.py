@@ -80,7 +80,7 @@ async def get_current_user(
         if username is None:
             raise credentials_exception
     except InvalidTokenError:
-        logger.error("Token aren't valida")
+        logger.error("Token aren't invalid")
         raise credentials_exception
     
     logger.info("Tokens are validated, Checking the user in the database")

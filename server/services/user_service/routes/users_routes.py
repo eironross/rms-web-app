@@ -35,12 +35,14 @@ async def get_current_user_from_auth_service(request: Request):
     logger.info(request.headers)
     ## cookie tokens
     access_token = request.cookies.get("access_token")
-    headers = {"Authorization": f"{access_token}"}
+    bearer_token = {"Authorization": f"{access_token}"}
     logger.info(headers)
+    
+    headers = request.headers if access_token is None else bearer_token
     async with httpx.AsyncClient() as client:
         try:    
             logger.info(f"Calling the Auth Serivices, {settings.AUTH_SERVICE_URL}")
-            response = await client.get(settings.AUTH_SERVICE_URL, headers=request.headers if access_token is None else access_token)
+            response = await client.get(settings.AUTH_SERVICE_URL, headers=headers)
             logger.info("The remote server return their reponse..")
         except httpx.RequestError:
             logger.error("Error occured: Service may not be available")
