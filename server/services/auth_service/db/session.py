@@ -13,11 +13,23 @@ AsyncSessionLocal = async_sessionmaker(
     class_=AsyncSession
 )
 
-@asynccontextmanager
+# @asynccontextmanager
+# async def get_db() -> AsyncGenerator[AsyncSession, None]:
+#       session = AsyncSessionLocal()
+#       try:
+#         print(f"Inside the get_db: {session}")
+#         yield session
+#       except Exception as e:
+#         print(f"Error occured: {e}" )
+        
+        
+# @asynccontextmanager
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
-      session = AsyncSessionLocal()
-      try:
-        print(f"Inside the get_db: {session}")
-        yield session
-      except Exception as e:
-        print(f"Error occured: {e}" )
+  async with AsyncSessionLocal() as session:
+    try:
+      print(f"Inside the get_db: {session}")
+      yield session
+    except Exception as e:
+      print(f"Error occured: {e}" )
+      raise
+

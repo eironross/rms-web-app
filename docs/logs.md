@@ -1,5 +1,24 @@
 # Changes on the Services
 
+## 03/19/2026
+
+### gateway
+- added the basic ratelimiter
+
+### auth_service, user_service
+- refactor crud functions remove the ```async with session as db:```
+- refactor parameter replaced from ```session``` to ```db```
+
+### issue
+- fixed the issue on the ```TypeError: '_AsyncGeneratorContextManager' object is not an async iterator```, the issue is the session module removed the ```@asynccontextmanger```
+- fixed the issue on the ```TypeError: dynamic_routing() got multiple values for argument 'full_path'```, note the position of the parameters
+
+### lookahead
+- test the routes then proceed in integrating the message brokers
+- fix the responses of the api
+- add timestamps for the rate limiter
+- create a api documentation to have a map of all routes with responses and paramters
+
 ## 11/28/2025
 - code freeze see you next year!
 

@@ -47,7 +47,7 @@ async def health():
         async with engine.begin() as conn:
             await conn.execute(text("SELECT 1"))
         return HomeResponse(
-        message="Welcome to my User Services",
+        message="Health Check",
         )
     except Exception:
         return HomeResponse(

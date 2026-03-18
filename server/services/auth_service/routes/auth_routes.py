@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, status, Response, Request
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from typing import Annotated
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 import jwt
 from jwt.exceptions import InvalidTokenError
@@ -12,7 +13,7 @@ from schemas.auth_schema import (
     UserOut, 
     User)
 from core.password import AuthService
-from db.session import get_db
+from db.session import get_db, engine
 from crud.auth_crud import (
     authenticate_users, 
     get_user, 
@@ -90,6 +91,19 @@ async def get_current_user(
         raise credentials_exception
     logger.info("User verified returning response!")
     return user
+    
+@routers.get("/health", tags=["health"], status_code=status.HTTP_200_OK)
+async def health():
+    """ Determine if the route up and running"""
+    try:    
+        logger.info("Just checking your health.")
+        async with engine.begin() as conn:
+            await conn.execute(text("SELECT 1"))
+        logger.info("Aight you good.~")    
+        return {"Message": "Health ok"}
+    except Exception:
+        logger.error("Whoops, not good!")
+        return {"Message": "Error in the Services"}
     
 @routers.post("/login", status_code=status.HTTP_202_ACCEPTED)
 async def login_for_access_tokens(

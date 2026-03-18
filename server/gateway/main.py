@@ -4,6 +4,11 @@ from starlette.responses import Response
 import httpx
 import os
 
+from utility.rate_limiter import rate_limited
+
+MAX_LIMIT = 5
+SECONDS = 10
+
 SERVICE_DISCOVERY = {
     "auth_service": os.environ.get("AUTH_SERVICE_URL"),
     "user_service": os.environ.get("USER_SERVICE_URL")   
@@ -22,13 +27,15 @@ app.add_middleware(
 )
 
 @app.get("/")
-async def root():
+@rate_limited(max_calls=MAX_LIMIT, time_frame=SECONDS)
+async def root(request: Request):
     return {
         "message": "Welcome to the API gateway for the Reporting Services"
         }
     
 @app.api_route("/{full_path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
-async def dynamic_routing(full_path: str, request: Request, access_token: str = Cookie(None)):
+@rate_limited(max_calls=MAX_LIMIT, time_frame=SECONDS)
+async def dynamic_routing(request: Request, full_path: str,  access_token: str = Cookie(None)):
     """ Dynamic Route to access any method then forward the request to appropriate services"""
     ## String Manipulate to create a target service url for the client
     target_service_url = None
