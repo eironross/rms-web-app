@@ -11,7 +11,8 @@ SECONDS = 10
 
 SERVICE_DISCOVERY = {
     "auth_service": os.environ.get("AUTH_SERVICE_URL"),
-    "user_service": os.environ.get("USER_SERVICE_URL")   
+    "user_service": os.environ.get("USER_SERVICE_URL"),
+    "report_service": os.environ.get("REPORT_SERVICE_URL")  
 }
 
 app = FastAPI()

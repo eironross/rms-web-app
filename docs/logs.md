@@ -1,5 +1,13 @@
 # Changes on the Services
 
+## 03/24/2026
+
+### report service
+- tables in the report service never being created in the rms_db
+
+### resolve
+- create the imports for the models in the db_init, moving forward import the models as well before executing the Base.metadata.create_all ```from models.report_model import ReportModel```
+
 ## 03/19/2026
 
 ### gateway

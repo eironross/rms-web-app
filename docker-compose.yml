@@ -25,6 +25,7 @@ services:
     environment:
       USER_SERVICE_URL: "http://user_service:8000"
       AUTH_SERVICE_URL: "http://auth_service:8000"
+      REPORT_SERVICE_URL: "http://report_service:8000"
     volumes:
       - ./server/gateway:/app
     command: uvicorn main:app --host 0.0.0.0 --reload
@@ -77,6 +78,27 @@ services:
         condition: service_healthy
     ports:
       - "8001:8000"
+
+  report_service:
+    build:
+      context: ./server/services/report_service
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_DRIVER: "postgresql+asyncpg"
+      POSTGRES_USER: admin   
+      POSTGRES_PASSWORD: admin
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: rms_db
+      AUTH_SERVICE_URL: "http://auth_service:8000/api/v1/auth/users/me"
+    volumes:
+      - ./server/services/report_service:/app
+    command: uvicorn main:app --host 0.0.0.0 --reload
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8002:8000"
 
 volumes:
   db_data:
