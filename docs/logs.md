@@ -1,5 +1,17 @@
 # Changes on the Services
 
+## 03/25/2026
+
+### report service
+- added the Status, Event and Unit tables in the report_model
+
+### lookahead
+- test model
+- test the routes then proceed in integrating the message brokers
+- fix the responses of the api
+- add timestamps for the rate limiter
+- create a api documentation to have a map of all routes with responses and paramters
+
 ## 03/24/2026
 
 ### report service
