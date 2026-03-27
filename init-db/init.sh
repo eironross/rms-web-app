@@ -23,25 +23,35 @@ CREATE TABLE user_service.user_roles (
     id SERIAL  PRIMARY KEY,
     role VARCHAR(100) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NULL
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE report_service.status (
     id SERIAL  PRIMARY KEY,
-    status_code VARCHAR(2) NOT NULL,
-    status_name VARCHAR(25) NOT NULL
-    is_active BOOLEAN
+    status_code VARCHAR(2) NOT NULL DEFAULT 'N/A',
+    status_name VARCHAR(25) NOT NULL DEFAULT 'N/A',
+    is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NULL
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE report_service.event_types (
     id SERIAL  PRIMARY KEY,
-    event_code VARCHAR(2) NOT NULL,
-    event_name VARCHAR(25) NOT NULL
-    is_active BOOLEAN
+    event_code VARCHAR(2) NOT NULL DEFAULT 'N/A',
+    event_name VARCHAR(25) NOT NULL DEFAULT 'N/A',
+    is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NULL
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE report_service.operating_units (
+    id SERIAL  PRIMARY KEY,
+    resource_name VARCHAR(15) NOT NULL DEFAULT 'N/A',
+    name VARCHAR(25) NOT NULL DEFAULT 'zzUnit test',
+    facility_id INTEGER NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 EOSQL
 
@@ -54,19 +64,26 @@ VALUES
     ('regulatory'),
     ('trader');
 
-INSERT INTO  report_service.status(status_code, status_name)
+INSERT INTO report_service.status(status_code, status_name)
 VALUES
     ('NW', 'New'),
     ('PD', 'Pending'),
     ('DU', 'Due'),
     ('SD', 'Submitted');
 
-INSERT INTO  report_service.event_types(event_code, event_name)
+INSERT INTO report_service.event_types(event_code, event_name)
 VALUES
     ('SN', 'Synchronization'),
-    ('FO', 'Fore Outage'),
+    ('FO', 'Force Outage'),
     ('PO', 'Planned Outage'),
     ('DN', 'Deration'),
     ('DM', 'Derating Maintenance');
+
+INSERT INTO report_service.operating_units(resource_name, name, facility_id)
+VALUES
+    ('01FHRI_G01', 'Fontaine Renewable Unit 1', 54),
+    ('01FHRI_G02', 'Fontaine Renewable Unit 2', 54),
+    ('01FHRI_G03', 'Fontaine Renewable Unit 3', 54),
+    ('01FHRI_G04', 'Fontaine Renewable Unit 4', 54);
 EOSQL
 

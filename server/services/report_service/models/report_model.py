@@ -19,19 +19,19 @@ class ReportModel(Base):
     
     title: Mapped[str] = mapped_column(
         VARCHAR(225),
-        nullable=True,
+        nullable=False,
         comment="Company Email of the user",
     )
     
     event_type_id: Mapped[int] = mapped_column(
-        ForeignKey("report_service.events_type.id"), 
+        ForeignKey("report_service.event_types.id"), 
         nullable=False,
         comment="Event Type Id like Synchronization, Forge Outage or Planned Outage"
     )
     
     report_details: Mapped[str] = mapped_column(
         TEXT,
-        nullable=True,
+        nullable=False,
         comment="Report details on what happen on the Power Plant",
         server_default=text("'Lorem Ipsum'")
     )
@@ -66,7 +66,7 @@ class ReportModel(Base):
         BOOLEAN,
         nullable=False,
         comment= "Determines whether a report is active or not",
-        server_default=text("TRUE")
+        server_default=text("'TRUE'")
     )
     
     created_by_id: Mapped[int] = mapped_column(
@@ -96,6 +96,7 @@ class ReportModel(Base):
         ),
         nullable=True,
         onupdate=func.now(),
+        server_default=func.now(),
         comment="Time the User was updated",
     )
 
@@ -110,21 +111,21 @@ class StatusModel(Base):
         INTEGER,
         nullable=False,
         primary_key=True,
-        index=True
+        index=True,
         comment="Primary key of the table"
     )
 
     status_code: Mapped[str] = mapped_column(
         VARCHAR(2),
-        nullable=True,
-        server_default=text("'N/A'")
+        nullable=False,
+        server_default=text("'N/A'"),
         comment="Code statuses for the reports"
     )
 
     status_name: Mapped[str] = mapped_column(
         VARCHAR(25),
-        nullable=True,
-        server_default=text("'N/A'")
+        nullable=False,
+        server_default=text("'N/A'"),
         comment="Status name for the report"
     )
 
@@ -132,7 +133,7 @@ class StatusModel(Base):
         BOOLEAN,
         nullable=False,
         comment= "Determines whether a field is active or not",
-        server_default=text("TRUE")
+        server_default=text("'TRUE'")
     )
 
     created_at: Mapped[datetime] = mapped_column(
@@ -150,6 +151,7 @@ class StatusModel(Base):
         ),
         nullable=True,
         onupdate=func.now(),
+        server_default=func.now(),
         comment="Time the User was updated",
     )
 
@@ -162,21 +164,21 @@ class EventTypeModel(Base):
         INTEGER,
         nullable=False,
         primary_key=True,
-        index=True
+        index=True,
         comment="Primary key of the table"
     )
 
     event_code: Mapped[str] = mapped_column(
         VARCHAR(2),
-        nullable=True,
-        server_default=text("'N/A'")
+        nullable=False,
+        server_default=text("'N/A'"),
         comment="Event code for the reports"
     )
 
     event_name: Mapped[str] = mapped_column(
         VARCHAR(25),
-        nullable=True,
-        server_default=text("'N/A'")
+        nullable=False,
+        server_default=text("'N/A'"),
         comment="Event name for the report"
     )
 
@@ -184,7 +186,7 @@ class EventTypeModel(Base):
         BOOLEAN,
         nullable=False,
         comment= "Determines whether a field is active or not",
-        server_default=text("TRUE")
+        server_default=text("'TRUE'")
     )
 
     created_at: Mapped[datetime] = mapped_column(
@@ -202,6 +204,7 @@ class EventTypeModel(Base):
         ),
         nullable=True,
         onupdate=func.now(),
+        server_default=func.now(),
         comment="Time the User was updated",
     )
 
@@ -214,21 +217,21 @@ class UnitNoModel(Base):
         INTEGER,
         nullable=False,
         primary_key=True,
-        index=True
+        index=True,
         comment="Primary key of the table"
     )
 
     resource_name: Mapped[str] = mapped_column(
         VARCHAR(15),
-        nullable=True,
-        server_default=text("'N/A'")
+        nullable=False,
+        server_default=text("'N/A'"),
         comment="Resource name equivalent from the Market Code"
     )
 
     name: Mapped[str] = mapped_column(
         VARCHAR(25),
-        nullable=True,
-        server_default=text("'zzUnit test'")
+        nullable=False,
+        server_default=text("'zzUnit test'"),
         comment="Unit name of the facility"
     )
 
@@ -236,12 +239,13 @@ class UnitNoModel(Base):
         INTEGER,
         nullable=False,
         comment="Unit's facility id where the unit is location"
-
+    )
+    
     is_active: Mapped[bool] = mapped_column(
         BOOLEAN,
         nullable=False,
         comment= "Determines whether a field is active or not",
-        server_default=text("TRUE")
+        server_default=text("'TRUE'")
     )
 
     created_at: Mapped[datetime] = mapped_column(
@@ -259,6 +263,7 @@ class UnitNoModel(Base):
         ),
         nullable=True,
         onupdate=func.now(),
+        server_default=func.now(),
         comment="Time the User was updated",
     )
 
