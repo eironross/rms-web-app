@@ -89,8 +89,7 @@ async def get_user_route(id: int, db: db_dependency, auth: Annotated[int, Depend
     logger.info("Returning a response")
     return UserResponse(
         data=user, 
-        message="Successfully retrieve the user",
-        status=200
+        message="Successfully retrieve the user"
     )
 @routers.get("/get-all", status_code=status.HTTP_200_OK)
 async def get_users_routes(
@@ -112,8 +111,7 @@ async def get_users_routes(
     logger.info("The task was successful returning a response.")
     return UserResponse(
         data=user, 
-        message="Successfully retrieve the user",
-        status=200
+        message="Successfully retrieve the user"
     )
     
 @routers.put("/update/{id}", status_code=status.HTTP_200_OK)
@@ -137,8 +135,7 @@ async def update_users_route(id: int, payload: UserUpdate, db: db_dependency, au
     logger.info("The task was successful returning a response.")
     return UserResponse(
         data=user,
-        message=f"Updated the user {id}",
-        status=201
+        message=f"Updated the user {id}"
         
     )
 
@@ -160,7 +157,6 @@ async def delete_users_route(id: int, db: db_dependency, auth: Annotated[int, De
     logger.info("The task was successful returning a response.")
     return UserResponse(
         data=UserID(id=id),
-        message=f"Sucessfully deleted the user, {id}",
-        status=204
+        message=f"Sucessfully deleted the user, {id}"
     )
     

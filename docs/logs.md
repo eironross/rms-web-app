@@ -1,5 +1,19 @@
 # Changes on the Services
 
+## 03/30/2026
+
+### report_service, auth_service, user_service
+- adding metadata on the schema (using somehow a envelope pattern)
+- report_service schema setup
+
+### lookahead
+- Prepare crud operation of the report
+- test the routes then proceed in integrating the message brokers
+- add timestamps for the rate limiter
+- create a api documentation to have a map of all routes with responses and paramters
+
+
+
 ## 03/26/2026
 
 ### report service

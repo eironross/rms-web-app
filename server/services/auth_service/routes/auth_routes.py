@@ -178,6 +178,5 @@ async def create_users_route(payload: User, db: db_dependency):
     logger.info("User registered. Returning a response to the client")    
     return UserResponse(
         data=user, 
-        message="Successfully created new user",
-        status=201
+        message="Successfully created new user"
     )

@@ -1,6 +1,9 @@
-from pydantic import EmailStr, BaseModel
+from pydantic import EmailStr, BaseModel, Field
 from typing import Optional, Union, List
 from datetime import datetime
+from core.config import settings
+
+import uuid
 
 class UserBase(BaseModel):
     first_name: str
@@ -30,13 +33,20 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     email: EmailStr | None = None    
 
+# API Reponses
+class MetaData(BaseModel):
+    request_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    timestamp: datetime = Field(default_factory=datetime.now)
+    version: str = settings.APP_VERSION
+    database: str = "auth_services"
+    pagination: Optional[List] = None
+
+
 class UserResponse(BaseModel):
     data: Union[TokenData, UserOut]
     tokens: Optional[Token] = None
+    metadata: MetaData = Field(default_factory=MetaData)
     message: str = "New user created"
-    status: int = 200
-    database: str = "auth_service"
-    return_in: datetime = datetime.now()
     success: bool = True
 
     class Config:
