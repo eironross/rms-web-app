@@ -1,5 +1,16 @@
 # Changes on the Services
 
+## 03/31/2026
+
+### report_service
+- adding the crud operation on the report_services
+- fix schema reponse
+
+### lookahead
+- test the routes then proceed in integrating the message brokers, route
+- add timestamps for the rate limiter
+- create a api documentation to have a map of all routes with responses and paramters
+
 ## 03/30/2026
 
 ### report_service, auth_service, user_service
@@ -11,8 +22,6 @@
 - test the routes then proceed in integrating the message brokers
 - add timestamps for the rate limiter
 - create a api documentation to have a map of all routes with responses and paramters
-
-
 
 ## 03/26/2026
 

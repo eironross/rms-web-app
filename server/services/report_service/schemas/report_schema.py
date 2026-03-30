@@ -9,9 +9,9 @@ import uuid
 # Create inputs for the report
 class ReportBase(BaseModel):
     title: str
-    event_type_id: int = 1 ## default to event
+    event_type_id: int
     report_details: str
-    status_id: int = 1 ## default to New Report
+    status_id: int
     unit_id: int
     event_date: date
     event_time: time
@@ -32,7 +32,10 @@ class ReportID(BaseModel):
     
 class ReportOut(ReportBase):
     id: Optional[int] = None
-    created_by: str
+    status_name: Optional[str] = None
+    unit_name: Optional[str] = None
+    event_name: Optional[str] = None
+    created_by: Optional[str] = None
     created_at: datetime
     response_type: Literal["full_report"] = "full"
     
