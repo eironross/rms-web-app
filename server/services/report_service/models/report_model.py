@@ -36,18 +36,18 @@ class ReportModel(Base):
         server_default=text("'Lorem Ipsum'")
     )
     
-    event_date: Mapped[date] = mapped_column(
-        DATE,
+    event_date: Mapped[str] = mapped_column(
+        VARCHAR(15),
         nullable=False,
         comment="Date for when the event occured",
-        server_default=func.current_date()
+        server_default=text("'9999-99-99'")
     )
     
-    event_time: Mapped[time] = mapped_column(
-        TIME,
+    event_time: Mapped[str] = mapped_column(
+        VARCHAR(10),
         nullable=False,
         comment="Time for when the event occured",
-        server_default=func.current_time()
+        server_default=text("'24:00'")
     )
     
     status_id: Mapped[int] = mapped_column(
@@ -77,7 +77,7 @@ class ReportModel(Base):
     
     modified_by_id: Mapped[int] = mapped_column(
         INTEGER, 
-        nullable=False,
+        nullable=True,
         comment="User Id for who modified the report"
     )
     

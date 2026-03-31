@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 ## Common Imports
 from db.db_init import create_db_and_tables
 from db.session import engine
-# from routes import __routers__
+from routes import __routers__
 from schemas.report_schema import HomeResponse
 from core.config import get_setting
 from core.logger import get_logger
@@ -30,8 +30,8 @@ app = FastAPI(
     version=settings.APP_VERSION
     )
 
-    # for route in __routers__:
-    #     app.include_router(route, prefix="/api/v1")
+for route in __routers__:
+    app.include_router(route, prefix="/api/v1")
 
 @app.get("/", status_code=status.HTTP_200_OK, response_model=HomeResponse)
 async def root():

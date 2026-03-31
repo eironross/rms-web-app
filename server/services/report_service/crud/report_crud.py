@@ -1,11 +1,14 @@
 ## Dependnecies
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func
+from sqlalchemy import select, func, text
 from sqlalchemy.orm import selectinload
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import HTTPException
 from pydantic import EmailStr
 
+from core.logger import get_logger
+
+logger = get_logger(__name__)
 ## Service Import
 from models.report_model import (ReportModel, 
                                  StatusModel, 
@@ -20,65 +23,71 @@ from schemas.report_schema import (HomeResponse,
                                    ReportReponse, 
                                    ReportUpdate)
 
-async def get_report(id: int, username: str,  db: AsyncSession) -> ReportOut:
+
+QUERY = text("""
+            SELECT
+                r.*
+                ,s.status_name
+                ,e.event_name
+                ,o.name 
+                ,u.email
+            FROM report_service.reports r
+            INNER JOIN report_service.status s ON s.id = r.status_id
+            INNER JOIN report_service.event_types e ON e.id = r.event_type_id
+            INNER JOIN report_service.operating_units o ON o.id = r.unit_id
+            INNER JOIN user_service.users u ON u.id = r.created_by_id
+            WHERE
+                (:report_id IS NULL OR r.id = :report_id)
+                     """)
+
+QUERY_ALL = text("""
+            SELECT
+                r.*
+                ,s.status_name
+                ,e.event_name
+                ,o.name 
+                ,u.email
+            FROM report_service.reports r
+            INNER JOIN report_service.status s ON s.id = r.status_id
+            INNER JOIN report_service.event_types e ON e.id = r.event_type_id
+            INNER JOIN report_service.operating_units o ON o.id = r.unit_id
+            INNER JOIN user_service.users u ON u.id = r.created_by_id
+            ORDER BY r.id
+            LIMIT :limit OFFSET :offset
+                     """) 
+
+async def get_report(id: int, db: AsyncSession) -> ReportOut:
     try:
-        result = (await db.execute(
-            select(ReportModel).where(ReportModel.id == id)
-        )).scalar_one_or_none()
+        result = (await db.execute(QUERY, {"report_id": id})).first()
         
         if result is None:
-            raise HTTPException(status_code=404, detail="User can't be found.")
+            raise HTTPException(status_code=404, detail="Report can't be found.")
+                
+        logger.info(f"Return the {result}") 
         
-        return ReportOut(
-            id=result.id,
-            title=result.title,
-            event_type_id=result.event_type_id,
-            report_details=result.report_details,
-            status_id=result.status_id,
-            unit_id=result.unit_id,
-            event_date=result.event_date,
-            event_time=result.event_time,
-            created_by=username,
-            created_at=result.created_at
-        )
-        
+    
+        return ReportOut(**result._mapping)
+
     except Exception as e: 
         print(f"Error occured in {e}")
         raise
 
 async def get_all_report(db: AsyncSession, page: int = 1, size: int = 10)-> ReportAll:
     try:
+        ## potentially to error if db wasnt initialliszed
         offset = (page - 1) * size
         total_count = (await db.execute(
             select(func.count(ReportModel.id))
         )).scalar()
         
-        result = (await db.execute(
-            select(ReportModel)
-            .options(
-                selectinload(ReportModel.status),
-                selectinload(ReportModel.events), 
-                selectinload(ReportModel.units)
-            )
-            .offset(offset).limit(size)
-        )).scalars().all()
-        print(result)
-        print(len(result))
+        result = await db.execute(QUERY_ALL, {"limit": size, "offset": offset})
         
-        reports = [ReportOut.model_validate({
-            "id": u.id,
-            "title": u.profile.first_name,
-            "unit_name": u.units.name, 
-            "event_name": u.events.event_name,
-            "status_name": u.status.status_name,
-            "report_details": u.report_details,
-            "event_date": u.event_date,
-            "event_time": u.event_time, 
-        })
-            for u in result]
+        if result is None:
+            raise HTTPException(status_code=404, detail="Report can't be found.")
     
+        reports = [ReportOut(**row) for row in result.mappings()]
         
-        print(reports)
+        logger.info(reports[0])
         return ReportAll(
             total_count=total_count, 
             page=page,
@@ -90,39 +99,41 @@ async def get_all_report(db: AsyncSession, page: int = 1, size: int = 10)-> Repo
         print(f"Error occured in {e}")
         raise 
 
-async def create_report(username: str, payload: ReportBase, db: AsyncSession) -> ReportOut:
+async def create_report(payload: ReportBase, db: AsyncSession) -> ReportOut:
     try: 
+        
+        name = (await db.execute(select(EventTypeModel)
+                                       .where(EventTypeModel.id == payload.status_id))).scalar_one_or_none()
+        
         new_report = ReportModel(
-            title=payload.title,
+            title=f"{payload.title} {name.event_name}",
             event_type_id=payload.event_type_id,
             report_details=payload.report_details,
             status_id=payload.status_id,
             unit_id=payload.unit_id,
-            event_date=payload.event_date,
-            event_time=payload.event_time
+            created_by_id=payload.created_by_id,
+            event_date=str(payload.event_date),
+            event_time=str(payload.event_time)
         )
         
         db.add(new_report) 
         await db.commit()
         await db.refresh(new_report)
         
-        return ReportOut(
-            id=new_report.id,
-            title=new_report.title,
-            event_type_id=new_report.event_type_id,
-            report_details=new_report.report_details,
-            status_id=new_report.status_id,
-            unit_id=new_report.unit_id,
-            event_date=new_report.event_date,
-            event_time=new_report.event_time,
-            created_by=username,
-            created_at=new_report.created_at
-        )
+        result = await db.execute(QUERY, {"report_id": new_report.id})
+        
+        row = result.first()
+        
+        logger.info(f"Return the {row} This is the obj {result}") 
+        
+        if row:
+            return ReportOut(**row._mapping)
+        
     except Exception as e: 
         print(f"Error occured in {e}")
         raise
     
-async def update_report(username: str, payload: ReportBase, db: AsyncSession) -> ReportOut:
+async def update_report(id: int, payload: ReportBase, db: AsyncSession) -> ReportOut:
     try:
         
         result = (await db.execute(
@@ -133,30 +144,28 @@ async def update_report(username: str, payload: ReportBase, db: AsyncSession) ->
             raise HTTPException(status_code=404, detail="Report can't be found.")
         
 
-        for key, value in payload.model_dump(exclude_unset=True, exclude={"first_name", "last_name", "role"}).items():
+        for key, value in payload.model_dump(exclude_unset=True, exclude={"id"}).items():
             setattr(result, key, value)
                         
         await db.commit()
         await db.refresh(result)
         
-        return ReportOut(
-            id=result.id,
-            title=result.title,
-            event_type_id=result.event_type_id,
-            report_details=result.report_details,
-            status_id=result.status_id,
-            unit_id=result.unit_id,
-            event_date=result.event_date,
-            event_time=result.event_time,
-            created_by=username,
-            created_at=result.created_at
-        )
+        result = await db.execute(QUERY, {"report_id": result.id})
+        
+        row = result.first()
+        
+        logger.info(f"Return the {row} This is the obj {result}") 
+        
+        if row:
+            return ReportOut(**row._mapping)
+
+        
         
     except Exception as e:
         print(f"Error occured in {e}")
         raise
     
-async def delete_user(id: ReportID, db: AsyncSession) -> ReportID:
+async def delete_report(id: ReportID, db: AsyncSession) -> ReportID:
     try:
         result = (await db.execute(
             select(ReportModel).where(ReportModel.id == id)

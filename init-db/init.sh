@@ -85,5 +85,7 @@ VALUES
     ('01FHRI_G02', 'Fontaine Renewable Unit 2', 54),
     ('01FHRI_G03', 'Fontaine Renewable Unit 3', 54),
     ('01FHRI_G04', 'Fontaine Renewable Unit 4', 54);
+
+
 EOSQL
 

@@ -5,9 +5,11 @@
 ### report_service
 - adding the crud operation on the report_services
 - fix schema reponse
+- added the routes for the crud operations
+- setup on the apidog
 
 ### lookahead
-- test the routes then proceed in integrating the message brokers, route
+- test the routes then proceed in integrating the message brokers
 - add timestamps for the rate limiter
 - create a api documentation to have a map of all routes with responses and paramters
 
