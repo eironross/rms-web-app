@@ -1,5 +1,16 @@
 # Changes on the Services
 
+## 04/07/2026
+
+### approval_service
+- adding the data model for approval_services
+- adding schemas for api input
+
+### lookahead
+- drop RabbitMQ for now; brokers may add complexity on the simple api
+- add timestamps for the rate limiter
+- create a api documentation to have a map of all routes with responses and parameters
+
 ## 03/31/2026
 
 ### report_service

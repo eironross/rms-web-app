@@ -53,6 +53,24 @@ CREATE TABLE report_service.operating_units (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE TABLE approval_service.approval_hierarchy (
+    id SERIAL PRIMARY KEY,
+    status VARCHAR(100) NULL, 
+    rolename VARCHAR(100) NULL,
+    approval_level INTEGER NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE approval_service.approval_status (
+    id SERIAL  PRIMARY KEY,
+    status_name VARCHAR(100) NOT NULL DEFAULT 'N/A',
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 EOSQL
 
 echo "Inserting initial roles into '$DB_NAME'..."
@@ -86,6 +104,21 @@ VALUES
     ('01FHRI_G03', 'Fontaine Renewable Unit 3', 54),
     ('01FHRI_G04', 'Fontaine Renewable Unit 4', 54);
 
+INSERT INTO approval_service.approval_hierarchy(status, rolename, approval_level)
+VALUES
+    ('Rejected', NULL, -1),
+    ('Return to Submitter', NULL, 0),
+    ('Pending with the Senior Energy Trader', 'Senior Energy Trader', 1),
+    ('Pending with the Team Leader', 'Team Leader', 2),
+    ('Pending with the VP of the Market Operations', 'Vice President Market Operations', 3),
+    ('Closed', NULL, 4);
 
+INSERT INTO approval_service.approval_status(status_name)
+VALUES
+    ('New'),
+    ('Completed'),
+    ('Updated'),
+    ('Rejected'),
+    ('Return to Submitter');
 EOSQL
 

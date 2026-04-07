@@ -195,3 +195,22 @@ async def delete_report_route(id: int, db: db_dependency, auth: Annotated[int, D
         message=f"Sucessfully deleted the report, {id}"
     )
     
+
+@routers.post("/submit", status_code=status.HTTP_200_OK)
+async def submit_report(id: int, db: db_dependency, auth: Annotated[int, Depends(get_current_user_from_auth_service)]):
+    
+    # query report
+    result = await get_report(id, db)
+    
+    if not result:
+        raise HTTPException(
+            status_code=400,
+            detail="Something went wrong. When retriving the user."
+        )
+    logger.info("Report is retrieve, publishing to be received in the bus for approval_services")
+    
+    # publish into the bus for approval
+    
+    return HomeResponse(
+        message="Submitted report"
+    )
