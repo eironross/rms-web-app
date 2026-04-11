@@ -35,7 +35,7 @@ services:
       USER_SERVICE_URL: "http://user_service:8000"
       AUTH_SERVICE_URL: "http://auth_service:8000"
       REPORT_SERVICE_URL: "http://report_service:8000"
-      APPROVAL_SERVCICE_URL: "http://approval_service:8000"
+      APPROVAL_SERVICE_URL: "http://approval_service:8000"
     volumes:
       - ./server/gateway:/app
     command: uvicorn main:app --host 0.0.0.0 --reload

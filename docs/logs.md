@@ -1,5 +1,19 @@
 # Changes on the Services
 
+## 04/12/2026
+
+### gateway
+- adding the ```APPROVAL_SERVICE_URL```
+
+### approval_services
+- adding the crud operation for approval services ```/submit```
+- adding the routes, schemas for the api
+
+### lookahead
+- add timestamps for the rate limiter
+- create a api documentation to have a map of all routes with responses and parameters
+- create new routes, /update the approval, /approve the report /submit to agencies 
+
 ## 04/07/2026
 
 ### approval_service

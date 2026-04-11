@@ -37,7 +37,7 @@ QUERY = text("""
             INNER JOIN report_service.operating_units o ON o.id = r.unit_id
             INNER JOIN user_service.users u ON u.id = r.created_by_id
             WHERE
-                (:report_id IS NULL OR r.id = :report_id)
+                r.id = :report_id
                      """)
 
 QUERY_ALL = text("""

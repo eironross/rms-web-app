@@ -5,8 +5,8 @@ from contextlib import asynccontextmanager
 ## Common Imports
 from db.db_init import create_db_and_tables
 from db.session import engine
-# from routes import __routers__
-# from schemas.report_schema import HomeResponse
+from routes import __routers__
+from schemas.approval_schema import HomeResponse
 from core.config import get_setting
 from core.logger import get_logger
 
@@ -30,8 +30,8 @@ app = FastAPI(
     version=settings.APP_VERSION
     )
 
-# for route in __routers__:
-#     app.include_router(route, prefix="/api/v1")
+for route in __routers__:
+    app.include_router(route, prefix="/api/v1")
 
 @app.get("/", status_code=status.HTTP_200_OK)
 async def root():
@@ -43,7 +43,7 @@ async def health():
     try:
         logger.info("Checking health from the root")
         async with engine.begin() as conn:
-            await conn.execute(text("SELECT 1 FROM report_service.reports;"))
+            await conn.execute(text("SELECT 1 FROM approval_service.approval_history;"))
         return {"message": "hello, health check"}
     
     except Exception:

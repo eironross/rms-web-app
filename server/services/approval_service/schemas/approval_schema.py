@@ -16,6 +16,9 @@ class ApprovalBase(BaseModel):
     
 class ApprovalUpdate(BaseModel):
     approval_level_id: Optional[int] = None
+    comment: Optional[str] = None
+    status: Optional[int] = None 
+    modified_by_id: int
     
 # CRUD schema     
 class ApprovalID(BaseModel):

@@ -26,7 +26,7 @@ class ApprovalLevelModel(Base):
     rolename: Mapped[str] = mapped_column(
         VARCHAR(100),
         nullable=False,
-        comment="Company Email of the user",
+        comment="Role of theu user Trader, Admin, Manager",
     )
     
     approval_level: Mapped[str] = mapped_column(
