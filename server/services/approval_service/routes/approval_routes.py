@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, Depends, Query, status, Request
 from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
 from core.config import settings
-from crud.approval_crud import submit_report
+from crud.approval_crud import submit_report, approve_report
 from db.session import get_db, engine
 
 from schemas.approval_schema import (
@@ -103,4 +103,24 @@ async def submit_report_route(payload: ApprovalBase, db: db_dependency) -> Appro
         data=result, 
         message="Successfully created new request for Approval"
     )
+    
+
+@routers.post("/approve", status_code=status.HTTP_200_OK)
+async def approve_report_route(payload: ApprovalBase, db: db_dependency) -> ApprovalReponse:
+    
+    logger.info("Approving the report, will get back!")
+    result = await approve_report(payload, db)
+    
+    if not result:
+        raise HTTPException(
+            status_code=400,
+            detail="Something went wrong. When approving the report. Report may already be approved.."
+        )
+    
+    logger.info("Successfully updated new request for Approval. Returning a response to the client")    
+    return ApprovalReponse(
+        data=result, 
+        message="Successfully created new request for Approval"
+    )
+    
         

@@ -3,15 +3,17 @@ from typing import Optional, List, Union, Literal
 from datetime import datetime, date, time
 from core.config import settings
 
+from utility.approval_enum import ApprovalLevelId, ApprovalStatusId
+
 import uuid
         
         
 # Create inputs for the report
 class ApprovalBase(BaseModel):
     report_id: int
-    approval_level_id: int = 1 ## default approval to the Senior Energy Trader
+    approval_level_id: Optional[int] = ApprovalLevelId.SENIOR_ENERGY_TRADER ## default approval to the Senior Energy Trader
     comment: str
-    status_id: int = 1 ## default to new approval status
+    status_id: Optional[int] = ApprovalStatusId.NEW_STATUS ## default to new approval status
     created_by_id: int
     
 class ApprovalUpdate(BaseModel):

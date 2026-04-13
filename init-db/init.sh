@@ -22,6 +22,7 @@ psql -v ON_ERROR_STOP=1 -U "$DB_USER" -d "$DB_NAME" <<-EOSQL
 CREATE TABLE user_service.user_roles (
     id SERIAL  PRIMARY KEY,
     role VARCHAR(100) NOT NULL,
+    role_level INTEGER NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -75,12 +76,14 @@ EOSQL
 
 echo "Inserting initial roles into '$DB_NAME'..."
 psql -v ON_ERROR_STOP=1 -U "$DB_USER" -d "$DB_NAME" <<-EOSQL
-INSERT INTO user_service.user_roles (role)
+INSERT INTO user_service.user_roles (role, role_level)
 VALUES
-    ('admin'),
-    ('manager'),
-    ('regulatory'),
-    ('trader');
+    ('admin', -1),
+    ('energy trader', 0),
+    ('senior energy trader', 1),
+    ('team leader', 2),
+    ('regulatory', 3),
+    ('market operations', 4);
 
 INSERT INTO report_service.status(status_code, status_name)
 VALUES
@@ -110,8 +113,9 @@ VALUES
     ('Return to Submitter', NULL, 0),
     ('Pending with the Senior Energy Trader', 'Senior Energy Trader', 1),
     ('Pending with the Team Leader', 'Team Leader', 2),
-    ('Pending with the VP of the Market Operations', 'Vice President Market Operations', 3),
-    ('Closed', NULL, 4);
+    ('Pending with the Regulatory Officer', 'Regulatory Officer', 3),
+    ('Pending with the VP of the Market Operations', 'Vice President Market Operations', 4),
+    ('Closed', NULL, 5);
 
 INSERT INTO approval_service.approval_status(status_name)
 VALUES

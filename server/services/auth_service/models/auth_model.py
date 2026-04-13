@@ -135,6 +135,12 @@ class UserRoleModel(Base):
         comment="Role of the user, admin, regulatory, user"
     )
     
+    role_level: Mapped[int] = mapped_column(
+        INTEGER,
+        nullable=False,
+        comment="Role Level in the user roles"
+    )
+    
     created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(
             timezone=True

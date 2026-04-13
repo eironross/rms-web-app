@@ -3,7 +3,7 @@ from sqlalchemy import text
 from .session import engine
 from .base_class import Base
 from core.logger import get_logger
-from models.approval_model import ApprovalHistory, ApprovalLevelModel, ApprovalRequestModel ## important to import the model before creating the tables
+from models.approval_model import ApprovalHistory, ApprovalLevelModel, ApprovalRequestModel, ApprovalStatusModel ## important to import the model before creating the tables
 
 
 logger = get_logger(__name__)

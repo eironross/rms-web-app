@@ -1,5 +1,17 @@
 # Changes on the Services
 
+## 04/14/2026
+
+### approval_services
+-adding reject_or_return in the crud
+-updated the mapping for the approval
+-added relationship on the ```ApprovalLevelModel``` and ```ApprovalRequestModel```
+-drop the need to query for the approval_name status from the crud
+
+### lookahead
+- add new routes ```/reject-or-return```
+- handle the return to submitter if the senior trader return it to the level 1 or energy trader
+
 ## 04/12/2026
 
 ### gateway
