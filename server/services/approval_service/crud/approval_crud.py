@@ -56,8 +56,8 @@ async def submit_report(payload: ApprovalBase, db: AsyncSession) -> ApprovalOut:
                                        .where(
                                            ApprovalRequestModel.report_id == payload.report_id,
                                            ApprovalRequestModel.is_active == True
-                                           ))).first()
-        
+                                           ))).scalar_one_or_none()
+        ##logger.info(f"The attribute for this are {dir(report)} {report.is_active}")
         if report:
             raise HTTPException(status_code=400, detail="Report is already being processed for approval.")
                 
@@ -109,7 +109,7 @@ async def approve_report(payload: ApprovalBase, db: AsyncSession) -> ApprovalOut
                                         .where(
                                            ApprovalRequestModel.report_id == payload.report_id,
                                            ApprovalRequestModel.is_active == True
-                                           ))).first()
+                                           ))).scalar_one_or_none()
                                             
         
         if report is None:
@@ -121,10 +121,11 @@ async def approve_report(payload: ApprovalBase, db: AsyncSession) -> ApprovalOut
         if user_details is None:
             raise HTTPException(status_code=404, detail="User can't be found.")
         
+        logger.info(f" The attributes for this {dir(report), report.approval_level_id}")
         # Determine the current level of the approval
         current_level = report.approval_requests.approval_level
         
-        logger.info(f"User current level is {current_level}")
+        logger.info(f"User current level is {current_level}, {report.approval_requests.status} User is {user_details.role_level}")
         
         # Validate of the approval_level and role_level matches if matches the report status will be updated. Else throw an error.
         if current_level != user_details.role_level:
@@ -134,10 +135,12 @@ async def approve_report(payload: ApprovalBase, db: AsyncSession) -> ApprovalOut
         status_id = ApprovalStatusId.UPDATED_STATUS
         
         # Determine the next level of the approval process    
-        next_level = ApprovalLevelId(current_level).next_level
+        next_level = ApprovalLevelId(report.approval_requests.id).next_level
         
         if next_level == ApprovalLevelId.CLOSED:
             status_id = ApprovalStatusId.COMPLETED_STATUS
+        
+        logger.info(f"Stopped at {next_level}")
         
         if next_level:
             
@@ -157,6 +160,8 @@ async def approve_report(payload: ApprovalBase, db: AsyncSession) -> ApprovalOut
             await db.commit()
             await db.refresh(new_approval)
             
+            logger.info(dir(new_approval))
+            
             return ApprovalOut(
                     id=new_approval.id,
                     description=new_approval.description,
@@ -168,7 +173,7 @@ async def approve_report(payload: ApprovalBase, db: AsyncSession) -> ApprovalOut
                     status_id=new_approval.status_id,
                     status_name=new_approval.status.status_name
                 )
-        return {"message": "Report was already approved by management. Please submit the report to the agencies"}
+        return None
         
         
     except Exception as e: 
@@ -182,7 +187,8 @@ async def reject_or_return_report(payload: ApprovalBase, db: AsyncSession) -> Ap
             raise HTTPException(status_code=400, detail="Wrong path you can't approve on this path. Only Reject or Return to Submitter")
         
         report: ApprovalRequestModel = (await db.execute(select(ApprovalRequestModel)
-                                        .where(ApprovalRequestModel.report_id == payload.report_id))).scalar_one_or_none()
+                                        .where(ApprovalRequestModel.report_id == payload.report_id,
+                                           ApprovalRequestModel.is_active == True))).scalar_one_or_none()
         
         if report is None:
             raise HTTPException(status_code=400, detail="Report can't be found")
@@ -193,10 +199,9 @@ async def reject_or_return_report(payload: ApprovalBase, db: AsyncSession) -> Ap
         if user_details is None:
             raise HTTPException(status_code=404, detail="User can't be found.")
         
-        # Determine the current level of the approval
         current_level = report.approval_requests.approval_level
         
-        logger.info(f" Current level is {current_level}")
+        logger.info(f"User current level is {current_level}, {report.approval_requests.status} User is {user_details.role_level}")
         
         # Validate of the approval_level and role_level matches if matches the report status will be updated. Else throw an error.
         if current_level != user_details.role_level:
@@ -205,13 +210,14 @@ async def reject_or_return_report(payload: ApprovalBase, db: AsyncSession) -> Ap
         
         if payload.approval_level_id == ApprovalLevelId.REJECTED:
             report.approval_level_id = ApprovalLevelId.REJECTED
-            report.is_active = False
             status_id = ApprovalStatusId.REJECTED_STATUS
         
         else:
-            report.approval_level_id = current_level - 1
+            report.approval_level_id = ApprovalLevelId.RETURN_TO_SUBMITTER
             status_id = ApprovalStatusId.RETURN_TO_SUBMITTER_STATUS
-            
+        
+        # Update the status of the ApprovalRequestModel
+        report.is_active = False  
             
         new_approval: ApprovalHistory = ApprovalHistory(
                     description=f"Report status changed by {user_details.first_name} {user_details.last_name}, {status_id}",
@@ -221,9 +227,11 @@ async def reject_or_return_report(payload: ApprovalBase, db: AsyncSession) -> Ap
                     created_by_id=payload.created_by_id,
                 )
             
+        # Update the database create a new Approval history and Deactivate the Approval Request    
         db.add(new_approval)  
         await db.commit()
         await db.refresh(new_approval)
+        await db.refresh(report)
         
         return ApprovalOut(
                     id=new_approval.id,

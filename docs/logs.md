@@ -1,5 +1,16 @@
 # Changes on the Services
 
+## 04/15/2026
+
+### approval_services
+- adding new route ```/reject-return```
+
+### lookahead
+- api testing and documentation
+
+### db init
+- remove ```create_db.sql```
+
 ## 04/14/2026
 
 ### approval_services

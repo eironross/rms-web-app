@@ -79,7 +79,7 @@ class ApprovalRequestModel(Base):
     )
     
     approval_level_id: Mapped[int] = mapped_column(
-        ForeignKey("approval_service.approval_hierarchy"),
+        ForeignKey("approval_service.approval_hierarchy.id"),
         nullable=False,
         default=ApprovalLevelId.SENIOR_ENERGY_TRADER,
         comment="Id that can be combined with the approval_level table"

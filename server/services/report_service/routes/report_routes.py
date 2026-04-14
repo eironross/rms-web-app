@@ -133,7 +133,7 @@ async def get_report_routes(
     
 
 @routers.post("/create", status_code=status.HTTP_200_OK)
-async def create_report_route(payload: ReportBase, db: db_dependency) -> ReportReponse:
+async def create_report_route(payload: ReportBase, db: db_dependency,  auth: Annotated[int, Depends(get_current_user_from_auth_service)]) -> ReportReponse:
     
     logger.info("Creating the report, will get back!")
     result = await create_report(payload, db)

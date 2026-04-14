@@ -32,6 +32,7 @@ class ApprovalOut(ApprovalBase):
     description: Optional[str] = None
     approval_level: Optional[str] = None
     rolename: Optional[str] = None 
+    status_name: Optional[str] = None
     # response_type: Literal["full_report"] = "full_report"
     
     class Config:
